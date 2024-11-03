@@ -1,17 +1,22 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import QUESTIONS from '../questions.js'
 import quizCompleteIcon from '../assets/quiz-complete.png'
+import QuestionTimer from './QuestionTimer.jsx';
 
 export default function Quiz() {
   const [userAnswers, setUserAnswers] = useState([]);
   const activatedQuestionIndex = userAnswers.length;
   const quizIsComplete = activatedQuestionIndex === QUESTIONS.length;
 
-  function handleSelectedAnswer(answer) {
+  const handleSelectedAnswer = useCallback(function handleSelectedAnswer(answer) {
     setUserAnswers((prevAnswer) => {
       return [...prevAnswer, answer];
     });
-  }
+  }, []);
+
+  const handleSkipAnswer = useCallback(()=>{
+    handleSelectedAnswer(null)
+  }, [handleSelectedAnswer]);
 
   if(quizIsComplete) {
     return <>
@@ -27,6 +32,7 @@ export default function Quiz() {
 
   return <>
     <div id="quiz">
+      <QuestionTimer key={activatedQuestionIndex} timeout={10000} onTimeout={handleSkipAnswer}/>
       <div className="question">
         <h2>{QUESTIONS[activatedQuestionIndex].text}</h2>
         <ul id="answers">
